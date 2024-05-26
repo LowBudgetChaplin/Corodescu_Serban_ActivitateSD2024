@@ -1,0 +1,5 @@
+1 Hilton 2 Popescu 300.5
+2 Marriott 1 Ionescu 150.75
+3 Radisson 3 Popescu 450.0
+4 Sheraton 1 Georgescu 200.0
+5 Intercontinental 2 Vasilescu 320.25
