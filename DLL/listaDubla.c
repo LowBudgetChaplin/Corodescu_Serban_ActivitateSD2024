@@ -160,7 +160,7 @@ void sortareNoduri(ListaDubla* lista) {
 		swapped = 0;
 		current = lista->cap;
 		while (current->next) {
-			if (current->info.buget > current->info.buget) {
+			if (current->info.buget > current->next->info.buget) {
 				Proiect temp = current->info;
 				current->info = current->next->info;
 				current->next->info = temp;
