@@ -1,0 +1,6 @@
+5
+12 Proiect1 Serban 5 300.0
+34 Proiect2 Andrei 3 400.0
+56 Proiect3 Mihai 2 800.0
+78 Proiect4 Pavel 7 1200.0
+910 Proiect5 Diana 8 1000.0
