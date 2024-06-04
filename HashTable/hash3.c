@@ -27,8 +27,8 @@ struct Nod {
 
 int functieHash(const char* numeCandidat, int dimTotala) {
 	int suma = 0;
-	for (int i = 0; i < strlen(beneficiar); i++) {
-		suma += beneficiar[i];
+	for (int i = 0; i < strlen(numeCandidat); i++) {
+		suma += numeCandidat[i];
 	}
 	return suma % dimTotala;
 }
