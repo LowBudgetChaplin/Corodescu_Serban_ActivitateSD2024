@@ -25,7 +25,7 @@ struct HashTable {
 	Nod** lista;
 };
 
-int functieHash(char* beneficiar, int dimensiuneTotala) {
+int functieHash(const char* beneficiar, int dimensiuneTotala) {
 	int suma = 0;
 	for (int i = 0; i < strlen(beneficiar); i++) {
 		suma += beneficiar[i];
@@ -144,7 +144,7 @@ float ruteurnareBuget(HashTable tabela, const char* beneficiar) {
 		if (strcmp(temp->info.beneficiar, beneficiar) == 0) {
 			bugetTotal += temp->info.buget;
 		}
-		temp=temp->next
+		temp=temp->next;
 	}
 	return bugetTotal;
 }
