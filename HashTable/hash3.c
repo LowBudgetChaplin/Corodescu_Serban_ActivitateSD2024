@@ -33,6 +33,29 @@ int functieHash(const char* beneficiar, int dimTotala) {
 	return suma % dimTotala;
 }
 
+//Varianta cu handle de coliziuni
+//void handleColiziuni(Nod** lista, DosarCandidat d) {
+//	Nod* nou = (Nod*)malloc(sizeof(Nod));
+//	nou->info = d;
+//	nou->next = NULL;
+//
+//	if (*lista == NULL) {
+//		*lista = nou;
+//	}
+//	else {
+//		Nod* current = *lista;
+//		while (current->next != NULL) {
+//			current = current->next;
+//		}
+//		current->next = nou;
+//	}
+//}
+//
+//void inserareCuColiziuni(HashTable* tabela, DosarCandidat d) {
+//	int index = functieHash(d.numeCandidat, tabela->dim);
+//	handleColiziuni(&tabela->lista[index], d);
+//}
+
 void inserareInHashTable(HashTable* tabela, DosarCandidat d) {
 	int index = functieHash(d.numeCandidat, tabela->dim);
 	Nod* nou = (Nod*)malloc(sizeof(Nod));
