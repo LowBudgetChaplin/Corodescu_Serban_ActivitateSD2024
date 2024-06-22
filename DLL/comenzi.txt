@@ -1,0 +1,26 @@
+5
+1
+In progress
+Serban Corodescu
+2
+250.80
+2
+Completed
+Stefan Mihaescu
+5
+3.3
+3
+In progress
+Eduard Costel
+4
+1200.00
+4
+Pending
+Emanuel Datcu
+1
+60.50
+5
+Completed
+Robert Casian
+5
+30.2

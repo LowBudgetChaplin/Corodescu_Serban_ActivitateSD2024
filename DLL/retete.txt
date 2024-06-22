@@ -1,0 +1,31 @@
+5
+1
+Serban Corodescu
+Ionascu Diana
+Bolnav
+2
+250.80
+2
+Stefan Constantin
+Eduard Mihaescu
+Sub tratament
+1
+125.21
+3
+Flavius Merisan
+Doctor Mihail
+Racit
+4
+823.01
+4
+Mihai Bendeac
+Fratele lui Bendeac
+Cu gripa
+1
+60.50
+5
+John Doi
+Robert Casian
+Apendicita
+10
+1200.12
