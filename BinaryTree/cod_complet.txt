@@ -1,0 +1,253 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Proiect Proiect;
+typedef struct Nod Nod;
+
+struct Proiect {
+    unsigned int id;
+    char* titluProiect;
+    char* contractant;
+    unsigned char durata;
+    float buget;
+    float stadiu;
+};
+
+struct Nod {
+    Nod* st;
+    Nod* dr;
+    Proiect info;
+};
+
+void afisareProiect(Proiect p) {
+    printf("Proiectul cu id %u, titlul %s, nume contractant %s, cu o durata de %hhu zile, cu bugetul de %.2f si stadiul de %.2f%%\n",
+           p.id, p.titluProiect, p.contractant, p.durata, p.buget, p.stadiu);
+}
+
+void inserareNod(Nod** rad, Proiect p) {
+    if (*rad) {
+        if ((*rad)->info.id > p.id) {
+            inserareNod(&((*rad)->st), p);
+        } else {
+            inserareNod(&((*rad)->dr), p);
+        }
+    } else {
+        Nod* nou = (Nod*)malloc(sizeof(Nod));
+        nou->dr = NULL;
+        nou->st = NULL;
+        nou->info = p;
+        *rad = nou;
+    }
+}
+
+Proiect citireProiect(FILE* f) {
+    Proiect p;
+    char buffer[256];
+
+
+    if (fgets(buffer, 256, f) == NULL) return p;
+    sscanf(buffer, "%u", &p.id);
+
+    if (fgets(buffer, 256, f) == NULL) return p;
+    buffer[strcspn(buffer, "\n")] = 0;
+    p.titluProiect = (char*)malloc(strlen(buffer) + 1);
+    strcpy(p.titluProiect, buffer);
+
+    if (fgets(buffer, 256, f) == NULL) return p;
+    buffer[strcspn(buffer, "\n")] = 0;
+    p.contractant = (char*)malloc(strlen(buffer) + 1);
+    strcpy(p.contractant, buffer);
+
+    if (fgets(buffer, 256, f) == NULL) return p;
+    sscanf(buffer, "%hhu", &p.durata);
+
+    if (fgets(buffer, 256, f) == NULL) return p;
+    sscanf(buffer, "%f", &p.buget);
+
+    if (fgets(buffer, 256, f) == NULL) return p;
+    sscanf(buffer, "%f", &p.stadiu);
+
+    return p;
+}
+
+Nod* citireNod(const char* fisier) {
+    Nod* radacina = NULL;
+    if (fisier != NULL && strlen(fisier) != 0) {
+        FILE* f = fopen(fisier, "r");
+        if (f != NULL) {
+            int dim = 0;
+            fscanf(f, "%d\n", &dim);
+            for (int i = 0; i < dim; i++) {
+                Proiect p = citireProiect(f);
+                inserareNod(&radacina, p);
+            }
+            fclose(f);
+        }
+    }
+    return radacina;
+}
+
+void afisareArboreInOrdine(Nod* rad) {
+    if (rad) {
+        afisareArboreInOrdine(rad->st);
+        afisareProiect(rad->info);
+        afisareArboreInOrdine(rad->dr);
+    }
+}
+
+void eliberareMemorieArbore(Nod* rad) {
+    if (rad) {
+        eliberareMemorieArbore(rad->st);
+        eliberareMemorieArbore(rad->dr);
+        free(rad->info.titluProiect);
+        free(rad->info.contractant);
+        free(rad);
+    }
+}
+
+int numrarProiecteContractantComun(Nod* rad, const char* contractant) {
+    if (!rad) {
+        return 0;
+    }
+    int count = 0;
+    if (strcmp(rad->info.contractant, contractant) == 0) {
+        count = 1;
+    }
+    return count 
+        + numrarProiecteContractantComun(rad->st, contractant) 
+        + numrarProiecteContractantComun(rad->dr, contractant);
+}
+
+Nod* cautaNod(Nod* rad, unsigned int id) {
+    if (!rad) return NULL;
+    if (rad->info.id == id) return rad;
+    if (rad->info.id > id) return cautaNod(rad->st, id);
+    return cautaNod(rad->dr, id);
+}
+
+void modificaStadiul(Nod* rad, unsigned int id, float procent) {
+    Nod* nod = cautaNod(rad, id);
+    if (nod) {
+        nod->info.stadiu = procent;
+    } else {
+        printf("Proiectul cu id %u nu a fost gasit.\n", id);
+    }
+}
+
+Nod* stergeNodFrunza(Nod* radacina) {
+    if (!radacina) return NULL;
+
+    if (!radacina->st && !radacina->dr) {
+        free(radacina->info.titluProiect);
+        free(radacina->info.contractant);
+        free(radacina);
+        return NULL;
+    }
+
+    radacina->st = stergeNodFrunza(radacina->st);
+    radacina->dr = stergeNodFrunza(radacina->dr);
+    
+    return radacina;
+}
+
+Nod* gasesteMin(Nod* rad) {
+    while (rad && rad->st) {
+        rad = rad->st;
+    }
+    return rad;
+}
+
+Nod* stergereRadacina(Nod* rad) {
+    if (!rad) return NULL;
+
+    if (!rad->st) {
+        Nod* temp = rad->dr;
+        free(rad->info.titluProiect);
+        free(rad->info.contractant);
+        free(rad);
+        return temp;
+    } else if (!rad->dr) {
+        Nod* temp = rad->st;
+        free(rad->info.titluProiect);
+        free(rad->info.contractant);
+        free(rad);
+        return temp;
+    }
+
+    Nod* temp = gasesteMin(rad->dr);
+    rad->info = temp->info;
+    rad->dr = stergereRadacina(rad->dr);
+
+    return rad;
+}
+
+void colecteazaProiecte(Nod* rad, float prag, Proiect*** vector, int* dim) {
+    if (rad) {
+        colecteazaProiecte(rad->st, prag, vector, dim);
+        if (rad->info.buget > prag) {
+            (*dim)++;
+            *vector = (Proiect**)realloc(*vector, (*dim) * sizeof(Proiect*));
+            (*vector)[*dim - 1] = &rad->info;
+        }
+        colecteazaProiecte(rad->dr, prag, vector, dim);
+    }
+}
+
+Proiect** obtinereProiectCuBugetMare(Nod* rad, float prag, int* dim) {
+    Proiect** vector = NULL;
+    *dim = 0;
+    colecteazaProiecte(rad, prag, &vector, dim);
+    return vector;
+}
+
+int inaltimeArbore(Nod* rad) {
+    if (rad == NULL) {
+        return 0;
+    } else {
+        int inaltimeStanga = inaltimeArbore(rad->st);
+        int inaltimeDreapta = inaltimeArbore(rad->dr);
+
+        return 1 + (inaltimeStanga > inaltimeDreapta ? inaltimeStanga : inaltimeDreapta);
+    }
+}
+
+int main() {
+    Nod* radacina = citireNod("proiect.txt");
+    printf("Arborele initial:\n");
+    afisareArboreInOrdine(radacina);
+
+    const char* contractant = "Germania";
+    int nrProiecteComune = numrarProiecteContractantComun(radacina, contractant);
+    printf("\nNr total de proiecte cu acelasi contractant este: %d\n", nrProiecteComune);
+
+    unsigned int id = 1;
+    float procent = 8;
+    modificaStadiul(radacina, id, procent);
+    printf("\nArborele dupa modificarea stadiului:\n");
+    afisareArboreInOrdine(radacina);
+
+    //printf("\nArborele dupa stergerea frunzelor:\n");
+    //radacina = stergeNodFrunza(radacina);
+    //afisareArboreInOrdine(radacina);
+
+    //printf("\nArborele dupa stergerea radacinii:\n");
+    //radacina = stergereRadacina(radacina);
+    //afisareArboreInOrdine(radacina);
+
+    float prag = 10000.0;
+    int dim;
+    Proiect** vectorProiecte = obtinereProiectCuBugetMare(radacina, prag, &dim);
+    printf("\nProiectele cu buget mai mare de %.2f:\n", prag);
+    for (int i = 0; i < dim; i++) {
+        afisareProiect(*vectorProiecte[i]);
+    }
+
+    int inaltimeABC = inaltimeArbore(radacina);
+    printf("\nInaltime arbore: %d\n", inaltimeABC);
+
+    free(vectorProiecte);
+    eliberareMemorieArbore(radacina);
+    return 0;
+}
