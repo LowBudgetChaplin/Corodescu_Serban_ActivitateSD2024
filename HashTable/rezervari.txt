@@ -1,0 +1,31 @@
+5
+1
+Ramada
+5
+Serban Miron
+3
+600.50;
+2
+Victoria
+3
+Eric Bogdan
+1
+150.00
+3
+Central
+4
+Marius
+2
+300.30
+4
+Muntenia
+4
+Ionut Ungureanu
+2
+200.00
+5
+Palas
+7
+John Doi
+7
+3000.80
