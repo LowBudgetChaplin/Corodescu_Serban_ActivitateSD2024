@@ -1,0 +1,5 @@
+4
+Emag Horia 2003 3000 50
+Flanco Sebi 2004 1300 24
+Facebook Mark 2000 34000 55
+Instagram Mark 2004 20000 32
