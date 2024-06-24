@@ -1,0 +1,31 @@
+5
+1
+HotelLux
+4
+Ion Popescu
+3
+1500.75
+2
+HotelPremium
+4
+Maria Ionescu
+2
+2000.50
+3
+HotelStandard
+3
+George Enescu
+1
+800.00
+4
+HotelBasic
+2
+Ana Popa
+5
+500.25
+5
+HotelDeluxe
+5
+Mihai Vasile
+4
+3200.00
