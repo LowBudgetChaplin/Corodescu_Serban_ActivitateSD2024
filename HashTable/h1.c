@@ -51,7 +51,7 @@ Hashtable initHashtable(int dim) {
 }
 
 void inserareHashtable(Hashtable* tabela, Rezervare r) {
-	int index = functieHash(r.numeClient, tabela->dim);
+	int index = functieHash(r.numeHotel, tabela->dim);
 	Nod* nou = (Nod*)malloc(sizeof(Nod));
 	nou->info = r;
 	nou->next = tabela->lista[index];
@@ -59,26 +59,26 @@ void inserareHashtable(Hashtable* tabela, Rezervare r) {
 }
 
 void afisareHashtable(Hashtable* tabela) {
-	if (tabela != NULL) {
+	if (tabela) {
 		for (int i = 0; i < tabela->dim; i++) {
-			Nod* current = tabela->lista[i];
-			while (current) {
-				afisareRezervare(current->info);
-				current = current->next;
+			Nod* nod = tabela->lista[i];
+			while (nod) {
+				afisareRezervare(nod->info);
+				nod = nod->next;
 			}
 		}
 	}
 }
 
 void dezalocareHashtable(Hashtable* tabela) {
-	if (tabela != NULL) {
+	if (tabela) {
 		for (int i = 0; i < tabela->dim; i++) {
-			Nod* current = tabela->lista[i];
-			while (current) {
-				Nod* temp = current;
-				current = current->next;
-				free(temp->info.numeHotel);
+			Nod* nod = tabela->lista[i];
+			while (nod) {
+				Nod* temp = nod;
+				nod = nod->next;
 				free(temp->info.numeClient);
+				free(temp->info.numeHotel);
 				free(temp);
 			}
 		}
@@ -182,6 +182,87 @@ void achizitieHotelDeAltHotel(Hashtable* tabela, const char* hotelCumparator, co
 	}
 }
 
+Hashtable* salveazaInHashTable(Hashtable* tabelaOriginala, unsigned char categorie) {
+	Hashtable* tabelaNoua = (Hashtable*)malloc(sizeof(Hashtable));
+	*tabelaNoua = initHashtable(tabelaOriginala->dim);
+
+	for (int i = 0; i < tabelaOriginala->dim; i++) {
+		Nod* nod = tabelaOriginala->lista[i];
+		while (nod) {
+			if (nod->info.categorieHotel == categorie) {
+				Rezervare newRezervare;
+				newRezervare.id = nod->info.id;
+				newRezervare.numeHotel = (char*)malloc(strlen(nod->info.numeHotel) + 1);
+				strcpy(newRezervare.numeHotel, nod->info.numeHotel);
+				newRezervare.categorieHotel = nod->info.categorieHotel;
+				newRezervare.numeClient = (char*)malloc(strlen(nod->info.numeClient) + 1);
+				strcpy(newRezervare.numeClient, nod->info.numeClient);
+				newRezervare.zileRezervate = nod->info.zileRezervate;
+				newRezervare.suma = nod->info.suma;
+
+				inserareHashtable(tabelaNoua, newRezervare);
+			}
+			nod = nod->next;
+		}
+	}
+	return tabelaNoua;
+}
+
+typedef struct NodLista NodLista;
+
+struct NodLista {
+	Rezervare info;
+	NodLista* next;
+};
+
+void inserareNodInLista(NodLista** cap, Rezervare r) {
+	NodLista* nod = (NodLista*)malloc(sizeof(NodLista));
+	nod->info.id = r.id;
+	nod->info.numeHotel = (char*)malloc(strlen(r.numeHotel) + 1);
+	strcpy(nod->info.numeHotel, r.numeHotel);
+	nod->info.categorieHotel = r.categorieHotel;
+	nod->info.numeClient = (char*)malloc(strlen(r.numeClient) + 1);
+	strcpy(nod->info.numeClient, r.numeClient);
+	nod->info.zileRezervate = r.zileRezervate;
+	nod->info.suma = r.suma;
+
+	nod->next = *cap;
+	*cap = nod;
+}
+
+void afisareLista(NodLista* cap) {
+	NodLista* nod = cap;
+	while (nod) {
+		afisareRezervare(nod->info);
+		nod = nod->next;
+	}
+}
+
+void dezalocareLista(NodLista* cap) {
+	NodLista* nod = cap;
+	while (nod) {
+		Nod* temp = nod;
+		nod = nod->next;
+		free(temp->info.numeHotel);
+		free(temp->info.numeClient);
+		free(temp);
+	}
+}
+
+NodLista* salvareInListaDinHashtable(Hashtable* tabela) {
+	NodLista* lista = NULL;
+	for (int i = 0; i < tabela->dim; i++) {
+		Nod* nod = tabela->lista[i];
+		while (nod) {
+			if (nod->info.suma > 300.5) {
+				inserareNodInLista(&lista, nod->info);
+			}
+			nod = nod->next;
+		}
+	}
+	return lista;
+}
+
 void main() {
 	Hashtable* tabela = citesteTabela("rezervari.txt");
 	afisareHashtable(tabela);
@@ -202,7 +283,17 @@ void main() {
 	achizitieHotelDeAltHotel(tabela, hotelCumparator, hotelAchizitionat);
 	afisareHashtable(tabela);
 
+	Hashtable* tabelaNou= salveazaInHashTable(tabela, categorie);
+	printf("\n\nTabela noua:\n");
+	afisareHashtable(tabelaNou);
+
+	NodLista* listaSimpla = salvareInListaDinHashtable(tabela);
+	printf("\n\nLista simpla inlantuita salvata DIN hashtable este:\n");
+	afisareLista(listaSimpla);
+
 	dezalocareHashtable(tabela);
+	dezalocareHashtable(tabelaNou);
+	dezalocareLista(listaSimpla);
 	tabela = NULL;
 	denumireHotel = NULL;
 	hotelCumparator = NULL;
